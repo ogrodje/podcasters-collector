@@ -1,10 +1,9 @@
-use std::borrow::Borrow;
 use std::time::Duration;
 
 use serde::Deserialize;
+use ureq::Agent;
 use ureq::serde_json::from_value as json_from_value;
 use ureq::serde_json::Value as JsonValue;
-use ureq::Agent;
 
 use crate::anchor_client::{parse_json, parse_string, to_anchor_error};
 use crate::config::anchor_episodes_url;
@@ -32,15 +31,13 @@ struct Episode {
     totalPlays: u32,
 }
 
-
 type CSRFToken = String;
 
-struct Anchor {
-    agent: Agent,
+struct AnchorAgent {
+    pub(self) agent: Agent,
 }
 
-
-impl Anchor {
+impl AnchorAgent {
     pub fn get_csrf_token(&mut self) -> Result<CSRFToken, AnchorError> {
         self.agent
             .get(config::ANCHOR_CSRF_URL)
@@ -55,14 +52,18 @@ impl Anchor {
             })
     }
 
-    pub fn post_login(&mut self, credentials: Credentials, token: CSRFToken) -> Result<(), AnchorError> {
+    pub fn post_login(
+        &mut self,
+        credentials: Credentials,
+        token: CSRFToken,
+    ) -> Result<(), AnchorError> {
         self.agent
             .post(config::ANCHOR_LOGIN_URL)
             .send_json(ureq::json!({
-            "email": credentials.email,
-            "password": credentials.password,
-            "_csrf": token,
-        }))
+                "email": credentials.email,
+                "password": credentials.password,
+                "_csrf": token,
+            }))
             .map_err(to_anchor_error)
             .and_then(parse_string)
             .map(|_| ())
@@ -77,7 +78,7 @@ impl Anchor {
             .map(|v| json_from_value(v).unwrap())
     }
 
-    fn get_episodes(&mut self, station_id: String) -> Result<JsonValue, AnchorError> {
+    pub(self) fn get_episodes(&mut self, station_id: String) -> Result<JsonValue, AnchorError> {
         self.agent
             .get(&format!(anchor_episodes_url!(), station_id))
             .call()
@@ -104,36 +105,23 @@ impl Anchor {
 
 pub(crate) fn main() {
     let credentials = credentials::from_env();
-
     let agent: Agent = ureq::AgentBuilder::new()
         .timeout_read(Duration::from_secs(2))
         .timeout_write(Duration::from_secs(2))
         .build();
+    let mut anchor = AnchorAgent { agent };
 
-    let mut anchor = Anchor { agent };
-    let _login = anchor.get_csrf_token()
-        .and_then(|token| anchor.post_login(credentials, token));
+    let _login = anchor
+        .get_csrf_token()
+        .and_then(|token| anchor.post_login(credentials, token))
+        .expect("Login procedure has failed.");
 
-    let episodes = anchor.get_metadata()
-        .and_then(|metadata| anchor.all_episodes(metadata.webStationId));
+    let episodes = anchor
+        .get_metadata()
+        .and_then(|metadata| anchor.all_episodes(metadata.webStationId))
+        .expect("Failed fetching episodes.");
 
-    for Ok(episode) in episodes.iter() {
+    for episode in episodes.iter() {
         println!("{} {}", episode.title, episode.totalPlays);
     }
-
-    /*
-    let _token =
-        get_csrf_token(agent.borrow()).and_then(|t| post_login(agent.borrow(), credentials, t));
-
-    let metadata_result = get_metadata(agent.borrow());
-
-    let episodes_result =
-        metadata_result.and_then(|m| all_episodes(agent.borrow(), m.webStationId));
-
-    let _x = episodes_result.map(|episodes| {
-        for episode in episodes.iter() {
-            println!("{} {}", episode.title, episode.totalPlays);
-        }
-    });
-     */
 }

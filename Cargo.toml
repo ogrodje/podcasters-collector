@@ -7,5 +7,5 @@ edition = "2021"
 
 [dependencies]
 rand = "0.8.5"
-ureq = { version = "2.5.0", features = ["json"] }
+ureq = { version = "2.5.0", features = ["json", "cookies"] }
 serde = { version = "1", features = ["derive"] }

@@ -38,7 +38,7 @@ pub fn main() {
 
     for member in &family {
         println!("Hello, {}", member)
-    };
+    }
 
     println!("Size: {:?}", family.len());
     for (i, m) in family.iter().enumerate() {

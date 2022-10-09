@@ -1,28 +1,28 @@
 use std::borrow::Borrow;
-use std::env;
 use std::time::Duration;
 
 use serde::Deserialize;
+use ureq::serde_json::from_value as json_from_value;
 use ureq::serde_json::Value as JsonValue;
 use ureq::Agent;
-use ureq::{serde_json};
 
-use crate::error::NewAnchorError;
+use crate::anchor_client::{parse_json, parse_string, to_anchor_error};
+use crate::config::anchor_episodes_url;
+use crate::credentials::Credentials;
+use crate::error::AnchorError;
+
+pub mod anchor_client;
+pub mod config;
+pub mod credentials;
 pub mod error;
 
-#[derive(Debug)]
-struct Credentials {
-    email: String,
-    password: String,
-}
-
 #[allow(non_snake_case)]
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize)]
 struct Metadata {
     webStationId: String,
 }
 
-#[allow(non_snake_case)]
+#[allow(non_snake_case, dead_code)]
 #[derive(Deserialize)]
 struct Episode {
     // episodeId: u32,
@@ -32,48 +32,19 @@ struct Episode {
     totalPlays: u32,
 }
 
-fn credentials_from_env() -> Credentials {
-    Credentials {
-        email: env::var("ANCHOR_EMAIL").expect("$ANCHOR_EMAIL is not set!"),
-        password: env::var("ANCHOR_PASSWORD").expect("$ANCHOR_PASSWORD is not set!"),
-    }
-}
-
 type CSRFToken = String;
 
-
-// impl Error for NewAnchorError {}
-
-fn parse_json(response: ureq::Response) -> Result<JsonValue, NewAnchorError> {
-    response
-        .into_json()
-        .map_err(|e| NewAnchorError::JSONParsingError(e.to_string()))
-}
-
-fn parse_string(response: ureq::Response) -> Result<String, NewAnchorError> {
-    response
-        .into_string()
-        .map_err(|e| NewAnchorError::StringParsingError(e.to_string()))
-}
-
-fn to_anchor_error(error: ureq::Error) -> NewAnchorError {
-    match error {
-        ureq::Error::Transport(e) => NewAnchorError::HttpError(e.to_string()),
-        other => NewAnchorError::HttpError(other.to_string()),
-    }
-}
-
-fn get_csrf_token(agent: &Agent) -> Result<CSRFToken, NewAnchorError> {
+fn get_csrf_token(agent: &Agent) -> Result<CSRFToken, AnchorError> {
     agent
-        .get("https://anchor.fm/api/csrf")
+        .get(config::ANCHOR_CSRF_URL)
         .call()
         .map_err(to_anchor_error)
         .and_then(parse_json)
-        .and_then(|json: JsonValue| {
+        .and_then(|json| {
             json["csrfToken"]
                 .as_str()
                 .map(String::from)
-                .ok_or(NewAnchorError::NoCSRFToken)
+                .ok_or(AnchorError::NoCSRFToken)
         })
 }
 
@@ -81,9 +52,9 @@ fn post_login(
     agent: &Agent,
     credentials: Credentials,
     token: CSRFToken,
-) -> Result<(), NewAnchorError> {
+) -> Result<(), AnchorError> {
     agent
-        .post("https://anchor.fm/api/login")
+        .post(config::ANCHOR_LOGIN_URL)
         .send_json(ureq::json!({
             "email": credentials.email,
             "password": credentials.password,
@@ -94,35 +65,28 @@ fn post_login(
         .map(|_| ())
 }
 
-fn get_metadata(agent: &Agent) -> Result<Metadata, NewAnchorError> {
+fn get_metadata(agent: &Agent) -> Result<Metadata, AnchorError> {
     agent
-        .get("https://anchor.fm/api/podcast/metadata")
+        .get(config::ANCHOR_METADATA_URL)
         .call()
         .map_err(to_anchor_error)
         .and_then(parse_json)
-        .map(|v| serde_json::from_value(v).unwrap())
+        .map(|v| json_from_value(v).unwrap())
 }
 
-fn get_episodes(agent: &Agent, station_id: String) -> Result<JsonValue, NewAnchorError> {
+fn get_episodes(agent: &Agent, station_id: String) -> Result<JsonValue, AnchorError> {
     agent
-        .get(
-            format!(
-                "https://anchor.fm/api/proxy/v3/stations/\
-        webStationId:{}/episodePage?limit=50&orderBy=publishOn",
-                station_id
-            )
-                .as_str(),
-        )
+        .get(&format!(anchor_episodes_url!(), station_id))
         .call()
         .map_err(to_anchor_error)
         .and_then(parse_json)
 }
 
-fn all_episodes(agent: &Agent, station_id: String) -> Result<Vec<Episode>, NewAnchorError> {
+fn all_episodes(agent: &Agent, station_id: String) -> Result<Vec<Episode>, AnchorError> {
     fn transform_episodes(items: &Vec<JsonValue>) -> Vec<Episode> {
         items
             .iter()
-            .map(|i| serde_json::from_value(i.clone()).unwrap())
+            .map(|i| json_from_value(i.clone()).unwrap())
             .collect()
     }
 
@@ -130,12 +94,12 @@ fn all_episodes(agent: &Agent, station_id: String) -> Result<Vec<Episode>, NewAn
         json["items"]
             .as_array()
             .map(transform_episodes)
-            .ok_or(NewAnchorError::TransformationFailed)
+            .ok_or(AnchorError::TransformationFailed)
     })
 }
 
 pub(crate) fn main() {
-    let credentials = credentials_from_env();
+    let credentials = credentials::from_env();
 
     let agent: Agent = ureq::AgentBuilder::new()
         .timeout_read(Duration::from_secs(5))
@@ -152,7 +116,7 @@ pub(crate) fn main() {
 
     let _x = episodes_result.map(|episodes| {
         for episode in episodes.iter() {
-            println!("{},{}", episode.title, episode.totalPlays);
+            println!("{} {}", episode.title, episode.totalPlays);
         }
     });
 }

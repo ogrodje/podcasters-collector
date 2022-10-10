@@ -26,4 +26,11 @@ impl fmt::Display for AnchorError {
     }
 }
 
+pub fn to_anchor_error(error: ureq::Error) -> AnchorError {
+    match error {
+        ureq::Error::Transport(e) => AnchorError::HttpError(e.to_string()),
+        other => AnchorError::HttpError(other.to_string()),
+    }
+}
+
 impl Error for AnchorError {}

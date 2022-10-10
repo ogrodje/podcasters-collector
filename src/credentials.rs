@@ -1,4 +1,5 @@
 use std::env;
+use std::env::VarError;
 
 #[derive(Debug)]
 pub struct Credentials {
@@ -6,9 +7,10 @@ pub struct Credentials {
     pub password: String,
 }
 
-pub fn from_env() -> Credentials {
-    Credentials {
-        email: env::var("ANCHOR_EMAIL").expect("$ANCHOR_EMAIL is not set!"),
-        password: env::var("ANCHOR_PASSWORD").expect("$ANCHOR_PASSWORD is not set!"),
+impl Credentials {
+    pub fn from_env() -> Result<Credentials, VarError> {
+        let email = env::var("ANCHOR_EMAIL")?;
+        let password = env::var("ANCHOR_PASSWORD")?;
+        Ok(Credentials { email, password })
     }
 }

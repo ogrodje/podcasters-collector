@@ -1,13 +1,10 @@
+use serde::Deserialize;
 use ureq::serde_json::{from_value as json_from_value, Value as JsonValue};
 use ureq::Agent;
-// use serde_derive::derive_deserialize as Deserialize;
-use crate::config::{anchor_episodes_url, ANCHOR_CSRF_URL, ANCHOR_LOGIN_URL, ANCHOR_METADATA_URL};
-use crate::Credentials;
-use serde::Deserialize;
-// use crate::credentials::Credentials;
-use crate::error::{to_anchor_error, AnchorError};
 
-// pub mod config;
+use crate::config::{anchor_episodes_url, ANCHOR_CSRF_URL, ANCHOR_LOGIN_URL, ANCHOR_METADATA_URL};
+use crate::error::{to_anchor_error, AnchorError};
+use crate::Credentials;
 
 #[allow(non_snake_case)]
 #[derive(Deserialize)]
@@ -49,23 +46,25 @@ impl AnchorClient {
     }
 
     pub fn get_csrf_token(&mut self) -> Result<CSRFToken, AnchorError> {
+        fn read_token(json: &JsonValue) -> Result<CSRFToken, AnchorError> {
+            json["csrfToken"]
+                .as_str()
+                .map(String::from)
+                .ok_or(AnchorError::NoCSRFToken)
+        }
+
         self.agent
             .get(ANCHOR_CSRF_URL)
             .call()
             .map_err(to_anchor_error)
             .and_then(AnchorClient::parse_json)
-            .and_then(|json| {
-                json["csrfToken"]
-                    .as_str()
-                    .map(String::from)
-                    .ok_or(AnchorError::NoCSRFToken)
-            })
+            .and_then(|json| read_token(&json))
     }
 
     pub fn post_login(
         &mut self,
-        credentials: Credentials,
-        token: CSRFToken,
+        credentials: &Credentials,
+        token: &CSRFToken,
     ) -> Result<(), AnchorError> {
         self.agent
             .post(ANCHOR_LOGIN_URL)
@@ -88,7 +87,7 @@ impl AnchorClient {
             .map(|v| json_from_value(v).unwrap())
     }
 
-    fn get_episodes(&mut self, station_id: String) -> Result<JsonValue, AnchorError> {
+    fn get_episodes(&mut self, station_id: &str) -> Result<JsonValue, AnchorError> {
         self.agent
             .get(&format!(anchor_episodes_url!(), station_id))
             .call()
@@ -96,7 +95,7 @@ impl AnchorClient {
             .and_then(AnchorClient::parse_json)
     }
 
-    pub fn all_episodes(&mut self, station_id: String) -> Result<Vec<Episode>, AnchorError> {
+    pub fn all_episodes(&mut self, station_id: &str) -> Result<Vec<Episode>, AnchorError> {
         fn transform_episodes(items: &Vec<JsonValue>) -> Vec<Episode> {
             items
                 .iter()

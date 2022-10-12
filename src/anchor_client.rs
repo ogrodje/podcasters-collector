@@ -1,6 +1,6 @@
 use serde::Deserialize;
 use ureq::serde_json::{from_value as json_from_value, Value as JsonValue};
-use ureq::Agent;
+use ureq::{Agent, Response};
 
 use crate::config::{anchor_episodes_url, ANCHOR_CSRF_URL, ANCHOR_LOGIN_URL, ANCHOR_METADATA_URL};
 use crate::error::{to_anchor_error, AnchorError};
@@ -33,13 +33,13 @@ impl AnchorClient {
         AnchorClient { agent }
     }
 
-    fn parse_json(response: ureq::Response) -> Result<JsonValue, AnchorError> {
+    fn parse_json(response: Response) -> Result<JsonValue, AnchorError> {
         response
             .into_json()
             .map_err(|e| AnchorError::JSONParsingError(e.to_string()))
     }
 
-    fn parse_string(response: ureq::Response) -> Result<String, AnchorError> {
+    fn parse_string(response: Response) -> Result<String, AnchorError> {
         response
             .into_string()
             .map_err(|e| AnchorError::StringParsingError(e.to_string()))
@@ -109,5 +109,47 @@ impl AnchorClient {
                 .map(transform_episodes)
                 .ok_or(AnchorError::TransformationFailed)
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_basic() {
+        assert_eq!(1, 1)
+    }
+
+    #[test]
+    #[should_panic]
+    fn parse_json_failure() -> () {
+        Response::new(200, "Ok", "broken-payload")
+            .map_err(|e| AnchorError::HttpError(e.to_string()))
+            .and_then(|r| AnchorClient::parse_json(r))
+            .expect("Boom");
+    }
+
+    #[test]
+    fn parse_json_ok() -> () {
+        let json_result = Response::new(200, "Ok", "{\"result\": \"ok\"}")
+            .map_err(|e| AnchorError::HttpError(e.to_string()))
+            .and_then(|r| AnchorClient::parse_json(r))
+            .unwrap();
+
+        assert!(json_result["result"] == "ok", "Parsing JSON has failed.")
+    }
+
+    #[test]
+    fn parse_string_ok() -> () {
+        let response = Response::new(200, "ok", "ok").unwrap();
+        assert!(AnchorClient::parse_string(response).unwrap() == "ok")
+    }
+
+    #[test]
+    #[should_panic]
+    fn parse_string_failure() -> () {
+        let response = Response::new(500, "ok", "x").unwrap();
+        assert!(AnchorClient::parse_string(response).unwrap() == "ok")
     }
 }

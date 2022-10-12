@@ -4,6 +4,8 @@ A tiny tool that collects stats from [Anchor](https://anchor.fm/).
 
 It's written in Rust, and it was great fun to build.
 
+I use it myself to check stats for my [podcast Ogrodje](https://anchor.fm/ogrodje).
+
 ## Usage & Development
 
 ```bash

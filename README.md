@@ -2,23 +2,21 @@
 
 A tiny tool that collects stats from [Anchor](https://anchor.fm/).
 
-It's written in Rust, and it was fun to build.
+It's written in Rust, and it was great fun to build.
 
 ## Usage & Development
 
-Get the latest Rust and then use cargo to build and run.
-
 ```bash
-$ cargo build --relase
+Usage: anchor-collector --email <EMAIL> --password <PASSWORD>
+
+Options:
+  -e, --email <EMAIL>
+  -p, --password <PASSWORD>
+  -h, --help                 Print help information
+  -V, --version              Print version information
 ```
 
-The tool needs `ANCHOR_EMAIL` and `ANCHOR_PASSWORD` environment variables to be set.
-
-```bash
-$ export ANCHOR_EMAIL="<email used for login>"
-$ export ANCHOR_PASSWORD="<password used for login>"
-$ ./target/release/anchor-collector
-```
+Get the latest Rust and then use cargo to build and run this thing.
 
 ## Author
 

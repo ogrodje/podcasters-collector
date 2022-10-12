@@ -16,10 +16,10 @@ impl fmt::Display for AnchorError {
         match self {
             AnchorError::HttpError(str) => f.write_str(&format!("HTTP Error {}", str.to_string())),
             AnchorError::JSONParsingError(inner) => {
-                f.write_str(&format!("JSON parsing failed {}", inner.to_string()))
+                f.write_str(&format!("JSON parsing has failed {}", inner.to_string()))
             }
             AnchorError::StringParsingError(inner) => {
-                f.write_str(&format!("String parsing failed {}", inner.to_string()))
+                f.write_str(&format!("String parsing has failed {}", inner.to_string()))
             }
             other => f.write_str(&format!("Error with {}", other)),
         }

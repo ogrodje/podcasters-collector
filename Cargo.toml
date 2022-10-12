@@ -5,6 +5,7 @@ edition = "2021"
 authors = ["Oto Brglez <otobrglez@gmail.com>"]
 
 [dependencies]
+clap = { version = "4.0.13", features = ["derive"] }
 rand = "0.8.5"
-ureq = { version = "2.5.0", features = ["json", "cookies"] }
 serde = { version = "1", features = ["derive"] }
+ureq = { version = "2.5.0", features = ["json", "cookies"] }

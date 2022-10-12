@@ -1,4 +1,4 @@
-# Anchor Collector
+# Anchor Collector 🦀
 
 A tiny tool that collects stats from [Anchor](https://anchor.fm/).
 

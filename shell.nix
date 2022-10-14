@@ -16,7 +16,7 @@ mkShell {
     rust-analyzer
     rust-toolchain
   ];
-  RUST_BACKTRACE = 1;
+  RUST_BACKTRACE = "full";
   RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}";
   #shellHook = ''
   #  export RUST_SRC_PATH=${pkgs.rustPlatform.rustcSrc}

@@ -8,7 +8,6 @@ pub struct Credentials {
 }
 
 impl Credentials {
-
     #[allow(dead_code)]
     pub fn from_env() -> Result<Credentials, VarError> {
         let email = env::var("ANCHOR_EMAIL")?;

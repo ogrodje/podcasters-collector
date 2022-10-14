@@ -1,3 +1,5 @@
+use credentials::*;
+
 pub mod anchor_client;
 pub mod config;
 pub mod credentials;

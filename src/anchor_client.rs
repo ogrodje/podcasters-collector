@@ -23,6 +23,7 @@ pub struct Episode {
 }
 
 type CSRFToken = String;
+type ResponseResult<R> = Result<R, AnchorError>;
 
 pub struct AnchorClient {
     pub(self) agent: Agent,
@@ -33,16 +34,34 @@ impl AnchorClient {
         AnchorClient { agent }
     }
 
-    fn parse_json(response: Response) -> Result<JsonValue, AnchorError> {
-        response
-            .into_json()
-            .map_err(|e| AnchorError::JSONParsingError(e.to_string()))
+    fn parse<R, F, FE>(response: Response, handle: F, map_err: FE) -> ResponseResult<R>
+    where
+        F: FnOnce(Response) -> Result<R, std::io::Error>,
+        FE: FnOnce(std::io::Error) -> AnchorError,
+    {
+        match response.status() {
+            200..=201 => handle(response).map_err(map_err),
+            code => Err(AnchorError::HttpError(format!(
+                "Failed! Status code: {}",
+                code
+            ))),
+        }
     }
 
-    fn parse_string(response: Response) -> Result<String, AnchorError> {
-        response
-            .into_string()
-            .map_err(|e| AnchorError::StringParsingError(e.to_string()))
+    pub fn parse_json(response: Response) -> ResponseResult<JsonValue> {
+        Self::parse(
+            response,
+            |r| r.into_json(),
+            |e| AnchorError::JSONParsingError(e.to_string()),
+        )
+    }
+
+    pub fn parse_string(response: Response) -> ResponseResult<String> {
+        Self::parse(
+            response,
+            |r| r.into_string(),
+            |e| AnchorError::StringParsingError(e.to_string()),
+        )
     }
 
     pub fn get_csrf_token(&mut self) -> Result<CSRFToken, AnchorError> {
@@ -109,47 +128,5 @@ impl AnchorClient {
                 .map(transform_episodes)
                 .ok_or(AnchorError::TransformationFailed)
         })
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_basic() {
-        assert_eq!(1, 1)
-    }
-
-    #[test]
-    #[should_panic]
-    fn parse_json_failure() -> () {
-        Response::new(200, "Ok", "broken-payload")
-            .map_err(|e| AnchorError::HttpError(e.to_string()))
-            .and_then(|r| AnchorClient::parse_json(r))
-            .expect("Boom");
-    }
-
-    #[test]
-    fn parse_json_ok() -> () {
-        let json_result = Response::new(200, "Ok", "{\"result\": \"ok\"}")
-            .map_err(|e| AnchorError::HttpError(e.to_string()))
-            .and_then(|r| AnchorClient::parse_json(r))
-            .unwrap();
-
-        assert!(json_result["result"] == "ok", "Parsing JSON has failed.")
-    }
-
-    #[test]
-    fn parse_string_ok() -> () {
-        let response = Response::new(200, "ok", "ok").unwrap();
-        assert!(AnchorClient::parse_string(response).unwrap() == "ok")
-    }
-
-    #[test]
-    #[should_panic]
-    fn parse_string_failure() -> () {
-        let response = Response::new(500, "ok", "x").unwrap();
-        assert!(AnchorClient::parse_string(response).unwrap() == "ok")
     }
 }

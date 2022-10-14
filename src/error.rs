@@ -1,8 +1,7 @@
 use std::error::Error;
-use std::fmt;
-use std::fmt::Formatter;
+use std::fmt::{Display, Formatter, Result};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum AnchorError {
     HttpError(String),
     JSONParsingError(String),
@@ -11,8 +10,8 @@ pub enum AnchorError {
     NoCSRFToken,
 }
 
-impl fmt::Display for AnchorError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+impl Display for AnchorError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         match self {
             AnchorError::HttpError(str) => f.write_str(&format!("HTTP Error {}", str.to_string())),
             AnchorError::JSONParsingError(inner) => {
@@ -32,5 +31,22 @@ pub fn to_anchor_error(error: ureq::Error) -> AnchorError {
         other => AnchorError::HttpError(other.to_string()),
     }
 }
+
+impl From<ureq::Error> for AnchorError {
+    fn from(error: ureq::Error) -> Self {
+        to_anchor_error(error)
+    }
+}
+
+/*
+impl From<std::io::Error> for AnchorError {
+    fn from(error: std::io::Error) -> Self {
+        match error {
+            e => AnchorError::StringParsingError(e.to_string()),
+            e => AnchorError::JSONParsingError(e.to_string())
+        }
+    }
+}
+*/
 
 impl Error for AnchorError {}

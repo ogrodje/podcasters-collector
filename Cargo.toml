@@ -1,8 +1,11 @@
 [package]
-name = "anchor-collector"
+name = "anchor_collector"
 version = "0.0.2"
 edition = "2021"
 authors = ["Oto Brglez <otobrglez@gmail.com>"]
+
+[features]
+# default = ["experimental"]
 
 [dependencies]
 clap = { version = "4.0.13", features = ["derive"] }

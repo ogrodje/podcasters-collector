@@ -9,11 +9,12 @@ I use it myself to check stats for my [podcast Ogrodje](https://anchor.fm/ogrodj
 ## Usage & Development
 
 ```bash
-Usage: anchor-collector --email <EMAIL> --password <PASSWORD>
+Usage: anchor-collector [OPTIONS] --email <EMAIL> --password <PASSWORD>
 
 Options:
   -e, --email <EMAIL>
   -p, --password <PASSWORD>
+  -f, --format <FORMAT>      [default: string] [possible values: string, json, csv]
   -h, --help                 Print help information
   -V, --version              Print version information
 ```

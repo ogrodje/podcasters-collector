@@ -1,4 +1,4 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use ureq::serde_json::{from_value as json_from_value, Value as JsonValue};
 use ureq::{Agent, Response};
 
@@ -13,7 +13,7 @@ pub struct Metadata {
 }
 
 #[allow(non_snake_case, dead_code)]
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Episode {
     // episodeId: u32,
     // webEpisodeId: String,
@@ -48,7 +48,7 @@ impl AnchorClient {
         }
     }
 
-    pub fn parse_json(response: Response) -> ResponseResult<JsonValue> {
+    fn parse_json(response: Response) -> ResponseResult<JsonValue> {
         Self::parse(
             response,
             |r| r.into_json(),
@@ -56,7 +56,7 @@ impl AnchorClient {
         )
     }
 
-    pub fn parse_string(response: Response) -> ResponseResult<String> {
+    fn parse_string(response: Response) -> ResponseResult<String> {
         Self::parse(
             response,
             |r| r.into_string(),
@@ -128,5 +128,51 @@ impl AnchorClient {
                 .map(transform_episodes)
                 .ok_or(AnchorError::TransformationFailed)
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[should_panic]
+    fn parse_json_failure() -> () {
+        Response::new(200, "Ok", "broken-payload")
+            .map_err(|e| AnchorError::HttpError(e.to_string()))
+            .and_then(|r| AnchorClient::parse_json(r))
+            .expect("Boom");
+    }
+
+    #[test]
+    #[should_panic]
+    fn parse_json_failure_500() -> () {
+        Response::new(500, "Ok", "broken-payload")
+            .map_err(|e| AnchorError::HttpError(e.to_string()))
+            .and_then(|r| AnchorClient::parse_json(r))
+            .expect("Boom");
+    }
+
+    #[test]
+    fn parse_json_ok() -> () {
+        let json_result = Response::new(200, "Ok", "{\"result\": \"ok\"}")
+            .map_err(|e| AnchorError::HttpError(e.to_string()))
+            .and_then(|r| AnchorClient::parse_json(r))
+            .unwrap();
+
+        assert!(json_result["result"] == "ok", "Parsing JSON has failed.")
+    }
+
+    #[test]
+    fn parse_string_ok() -> () {
+        let response = Response::new(200, "ok", "ok").unwrap();
+        assert_eq!(AnchorClient::parse_string(response).unwrap(), "ok")
+    }
+
+    #[test]
+    #[should_panic]
+    fn parse_string_failure() -> () {
+        let response = Response::new(500, "ok", "x").unwrap();
+        assert_eq!(AnchorClient::parse_string(response).unwrap(), "ok")
     }
 }

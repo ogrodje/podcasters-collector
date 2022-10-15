@@ -6,7 +6,7 @@ It's written in Rust, and it was great fun to build.
 
 I use it myself to check stats for my [podcast Ogrodje](https://anchor.fm/ogrodje).
 
-## Usage & Development
+## Usage
 
 ```bash
 Usage: anchor-collector [OPTIONS] --email <EMAIL> --password <PASSWORD>
@@ -19,7 +19,14 @@ Options:
   -V, --version              Print version information
 ```
 
+## Development
+
 Get the latest Rust and then use cargo to build and run this thing.
+
+```bash
+$ cargo build --release
+$ ./target/release/anchor-collector --help
+```
 
 ## Author
 

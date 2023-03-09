@@ -1,6 +1,6 @@
 [package]
 name = "anchor-collector"
-version = "0.0.3"
+version = "0.0.4"
 edition = "2021"
 authors = ["Oto Brglez <otobrglez@gmail.com>"]
 

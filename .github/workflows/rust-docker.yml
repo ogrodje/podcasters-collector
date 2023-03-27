@@ -84,7 +84,7 @@ jobs:
           prerelease: false
           release_name: "Latest"
           tag_name: ${{ github.ref }}
-          # body_path: CHANGELOG.md
+          body: "Latest release of podcasters-collector."
         env:
           GITHUB_TOKEN: ${{ github.token }}
 

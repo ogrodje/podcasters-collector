@@ -47,5 +47,5 @@ docker build . -t ogrodje/podcasters-collector -f Dockerfile
 
 ![Twitter Follow](https://img.shields.io/twitter/follow/otobrglez?style=social)
 
-
 [ghcr-podcasters-collector]: https://github.com/ogrodje/podcasters-collector/pkgs/container/podcasters-collector
+

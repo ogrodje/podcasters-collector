@@ -19,10 +19,10 @@ Options:
   -V, --version              Print version information
 ```
 
-Or with Docker Image
+Or with Docker Image available on [GitHub Container Registry - `ghcr.io`][ghcr-podcasters-collector].
 
 ```bash
-docker run -ti --rm ghcr.io/ogrodje/podcasters-collector:latest \
+docker run --rm ghcr.io/ogrodje/podcasters-collector:latest \
   podcasters-collector --email <EMAIL> --password <PASSWORD>
 ```
 
@@ -46,3 +46,6 @@ docker build . -t ogrodje/podcasters-collector -f Dockerfile
 - [Oto Brglez](https://github.com/otobrglez)
 
 ![Twitter Follow](https://img.shields.io/twitter/follow/otobrglez?style=social)
+
+
+[ghcr-podcasters-collector]: https://github.com/ogrodje/podcasters-collector/pkgs/container/podcasters-collector

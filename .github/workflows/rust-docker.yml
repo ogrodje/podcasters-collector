@@ -20,7 +20,14 @@ jobs:
       contents: read
       packages: write
 
-    steps:    
+    steps:
+      -
+        name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ogrodje/podcasters-collector
+      
       -
         name: Login to DockerHub
         # if: github.event_name != 'pull_request'
@@ -30,17 +37,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      #- name: Extract metadata
+      #  id: meta
+      #  uses: docker/metadata-action@v4
+      #  with:
+      #    images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
       
       -
         name: Build and push
         uses: docker/build-push-action@v4
         with:
           context: .
+          push: true
           # push: ${{ github.event_name != 'pull_request' }}
           #tags: ${{ steps.meta.outputs.tags }}
           #labels: ${{ steps.meta.outputs.labels }}

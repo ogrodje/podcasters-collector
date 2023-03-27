@@ -14,6 +14,9 @@ mkShell {
     pkgconfig
     rust-analyzer
     rust-toolchain
+    influxdb2-cli
+    influxdb2-server
+    influxdb2
   ] ++ 
   lib.optionals (!stdenv.isDarwin) [
     procps

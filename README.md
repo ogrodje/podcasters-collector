@@ -14,7 +14,7 @@ Usage: podcasters-collector [OPTIONS] --email <EMAIL> --password <PASSWORD>
 Options:
   -e, --email <EMAIL>
   -p, --password <PASSWORD>
-  -f, --format <FORMAT>      [default: string] [possible values: string, json, csv]
+  -f, --format <FORMAT>      [default: string] [possible values: string, csv, influx-dbcsv, json]
   -h, --help                 Print help information
   -V, --version              Print version information
 ```
@@ -24,6 +24,13 @@ Or with Docker Image available on [GitHub Container Registry - `ghcr.io`][ghcr-p
 ```bash
 docker run --rm ghcr.io/ogrodje/podcasters-collector:latest \
   podcasters-collector --email <EMAIL> --password <PASSWORD>
+```
+
+### Importing into InfluxDB
+
+```bash
+$ ./target/release/podcasters-collector ... --format influx-dbcsv > plays.csv
+$ influx write -b experimenting -f plays.csv
 ```
 
 ## Development

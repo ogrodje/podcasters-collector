@@ -15,8 +15,9 @@ mod printers;
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
 pub enum Format {
     String,
-    Json,
     CSV,
+    InfluxDBCSV,
+    Json,
 }
 
 #[derive(Parser)]
@@ -61,6 +62,7 @@ pub(crate) fn main() {
 
     match args.format {
         Format::CSV => Printers::print_csv(&episodes),
+        Format::InfluxDBCSV => Printers::print_influx_csv(&episodes),
         Format::Json => Printers::print_json(&episodes),
         _ => Printers::print_string(&episodes),
     }

@@ -1,5 +1,5 @@
-pub use anchor_collector::anchor_client::AnchorClient;
-pub use anchor_collector::error::*;
+pub use podcasters_collector::anchor_client::AnchorClient;
+pub use podcasters_collector::error::*;
 
 #[cfg(test)]
 mod tests {

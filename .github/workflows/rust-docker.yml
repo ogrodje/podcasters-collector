@@ -52,6 +52,7 @@ jobs:
           context: .
           push: true
           tags: ogrodje/podcasters-collector:latest
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           #file: Dockerfile
           # push: ${{ github.event_name != 'pull_request' }}
           #tags: ${{ steps.meta.outputs.tags }}

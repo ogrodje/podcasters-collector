@@ -1,4 +1,4 @@
-name: Rust
+name: Build
 
 on:
   push:
@@ -83,7 +83,7 @@ jobs:
           draft: false
           prerelease: false
           release_name: "Latest"
-          tag_name: ${{ github.ref }}
+          tag_name: ${{ github.ref }}-${{ github.sha }}
           body: "Latest release of podcasters-collector."
         env:
           GITHUB_TOKEN: ${{ github.token }}

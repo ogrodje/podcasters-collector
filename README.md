@@ -1,5 +1,7 @@
 # Spotify Podcasters Collector 🦀
 
+![podcasters-collector workflow](https://github.com/ogrodje/podcasters-collector/actions/workflows/rust-docker.yml/badge.svg)
+
 A tiny tool that collects stats from [Spotify Podcasters Platform](https://podcasters.spotify.com/).
 
 It's written in Rust, and it was great fun to build.

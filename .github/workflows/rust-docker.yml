@@ -1,10 +1,10 @@
 name: Rust
 
-on: [ 'push', 'pull_request' ]
-#  push:
-#    branches: [ "master" ]
-#  pull_request:
-#    branches: [ "master" ]
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
 
 permissions:
   contents: read
@@ -76,14 +76,23 @@ jobs:
           name: ${{ steps.package.outputs.name }}
           path: ${{ steps.package.outputs.file }}
 
-      - uses: actions/upload-artifact@v2
+      - name: release
+        uses: actions/create-release@v1
+        id: create_release
         with:
-          name: podcasters-collector-x86_64-unknown-linux-musl
-          path: target/x86_64-unknown-linux-musl/release/podcasters-collector
+          draft: false
+          prerelease: false
+          release_name: "Latest"
+          tag_name: ${{ github.ref }}
+          # body_path: CHANGELOG.md
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
 
-      - uses: ncipollo/release-action@v1
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         with:
-          allowUpdates: true
-          artifacts: ${{ steps.package.outputs.file }}
-          body: "Very latest release."
-          #bodyFile: "body.md"
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.package.outputs.file }}
+          asset_name: podcasters-collector-x86_64-unknown-linux-musl.tar.gz
+          asset_content_type: application/gzip

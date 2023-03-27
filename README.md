@@ -1,6 +1,6 @@
-# Anchor Collector 🦀
+# Spotify Podcasters Collector 🦀
 
-A tiny tool that collects stats from [Anchor](https://anchor.fm/).
+A tiny tool that collects stats from [Spotify Podcasters platform](https://podcasters.spotify.com/) ~[Anchor](https://anchor.fm/)~.
 
 It's written in Rust, and it was great fun to build.
 
@@ -9,7 +9,7 @@ I use it myself to check stats for my [podcast Ogrodje](https://anchor.fm/ogrodj
 ## Usage
 
 ```bash
-Usage: anchor-collector [OPTIONS] --email <EMAIL> --password <PASSWORD>
+Usage: podcasters-collector [OPTIONS] --email <EMAIL> --password <PASSWORD>
 
 Options:
   -e, --email <EMAIL>

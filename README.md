@@ -50,7 +50,7 @@ $ cargo build --release
 $ ./target/release/podcasters-collector --help
 ```
 
-Build a Docker image
+Build a local Docker image
 
 ```bash
 docker build . -t ogrodje/podcasters-collector -f Dockerfile

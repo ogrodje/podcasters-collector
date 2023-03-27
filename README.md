@@ -19,13 +19,26 @@ Options:
   -V, --version              Print version information
 ```
 
+Or with Docker Image
+
+```bash
+docker run -ti --rm docker.io/ogrodje/podcasters-collector podcasters-collector \
+  --email <EMAIL> --password <PASSWORD>
+```
+
 ## Development
 
 Get the latest Rust and then use cargo to build and run this thing.
 
 ```bash
 $ cargo build --release
-$ ./target/release/anchor-collector --help
+$ ./target/release/podcasters-collector --help
+```
+
+Build a Docker image
+
+```bash
+docker build . -t ogrodje/podcasters-collector -f Dockerfile
 ```
 
 ## Author

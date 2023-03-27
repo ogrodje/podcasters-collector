@@ -52,3 +52,36 @@ jobs:
 
       - run: cargo fmt --all -- --check
       - run: cargo build --release --target=x86_64-unknown-linux-musl
+      - run: strip 'target/x86_64-unknown-linux-musl/release/podcasters-collector'
+
+      - name: Get version
+        id: version
+        shell: bash
+        run: |
+          VERSION="$(cargo pkgid | cut -d'#' -f2 | cut -d: -f2)"
+          echo "::set-output name=version::$VERSION"
+          echo "::set-output name=tag::v$VERSION"
+
+      - name: Build package
+        id: package
+        shell: bash
+        run: |
+          ARCHIVE_NAME="podcasters-collector-${{ steps.version.outputs.tag }}-x86_64-unknown-linux-musl"
+          ARCHIVE_FILE="${ARCHIVE_NAME}.tar.gz"
+          mkdir "/tmp/${ARCHIVE_NAME}"
+          cp README.md "target/x86_64-unknown-linux-musl/release/podcasters-collector" "/tmp/${ARCHIVE_NAME}"
+          tar -czf "${PWD}/${ARCHIVE_FILE}" -C /tmp/ "${ARCHIVE_NAME}"
+          echo ::set-output "name=file::${ARCHIVE_FILE}"
+          echo ::set-output "name=name::${ARCHIVE_NAME}.tar.gz"
+
+      - name: Upload archive
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ steps.package.outputs.name }}
+          path: ${{ steps.package.outputs.file }}
+
+      - name: Upload raw binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: podcasters-collector
+          path: target/x86_64-unknown-linux-musl/release/podcasters-collector

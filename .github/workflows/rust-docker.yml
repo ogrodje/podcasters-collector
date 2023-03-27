@@ -80,3 +80,10 @@ jobs:
         with:
           name: podcasters-collector-x86_64-unknown-linux-musl
           path: target/x86_64-unknown-linux-musl/release/podcasters-collector
+
+      - uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: ${{ steps.package.outputs.file }}
+          body: "Very latest release."
+          #bodyFile: "body.md"

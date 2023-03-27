@@ -52,6 +52,7 @@ jobs:
 
       - run: cargo fmt --all -- --check
       - run: cargo build --release --target=x86_64-unknown-linux-musl
+
       - run: strip 'target/x86_64-unknown-linux-musl/release/podcasters-collector'
 
       - name: Get version

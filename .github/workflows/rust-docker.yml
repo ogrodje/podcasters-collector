@@ -40,3 +40,15 @@ jobs:
           tags: ${{ env.REGISTRY }}/ogrodje/podcasters-collector:latest
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+  cross-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: sudo apt-get install musl-tools
+      - run: |
+          rustup toolchain install stable --profile minimal && \
+          rustup component add rustfmt && \
+          rustup target add x86_64-unknown-linux-musl
+
+      - run: cargo fmt --all -- --check
+      - run: cargo build --release --target=x86_64-unknown-linux-musl

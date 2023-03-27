@@ -20,14 +20,7 @@ jobs:
       contents: read
       packages: write
 
-    steps:
-      -
-        name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: name/app
-      
+    steps:    
       -
         name: Login to DockerHub
         # if: github.event_name != 'pull_request'

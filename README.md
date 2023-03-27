@@ -19,7 +19,13 @@ Options:
   -V, --version              Print version information
 ```
 
-Or with Docker Image available on [GitHub Container Registry - `ghcr.io`][ghcr-podcasters-collector].
+### Binaries
+
+- [podcasters-collector for x86_64 with musl (.tar.gz)](https://github.com/ogrodje/podcasters-collector/releases/download/refs%2Fheads%2Fmaster/podcasters-collector-x86_64-unknown-linux-musl.tar.gz)
+
+### Docker
+
+With Docker Image available on [GitHub Container Registry - `ghcr.io`][ghcr-podcasters-collector].
 
 ```bash
 docker run --rm ghcr.io/ogrodje/podcasters-collector:latest \

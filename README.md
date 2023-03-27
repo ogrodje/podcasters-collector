@@ -1,10 +1,10 @@
 # Spotify Podcasters Collector 🦀
 
-A tiny tool that collects stats from [Spotify Podcasters platform](https://podcasters.spotify.com/) ~[Anchor](https://anchor.fm/)~.
+A tiny tool that collects stats from [Spotify Podcasters Platform](https://podcasters.spotify.com/).
 
 It's written in Rust, and it was great fun to build.
 
-I use it myself to check stats for my [podcast Ogrodje](https://anchor.fm/ogrodje).
+We use it ourselves to check stats for our [Podcast Ogrodje](https://anchor.fm/ogrodje).
 
 ## Usage
 

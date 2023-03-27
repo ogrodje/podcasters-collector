@@ -21,12 +21,12 @@ jobs:
       packages: write
 
     steps:
-      -
-        name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ogrodje/podcasters-collector
+      #-
+      #  name: Docker meta
+      #  id: meta
+      #  uses: docker/metadata-action@v4
+      #  with:
+      #    images: ogrodje/podcasters-collector
       
       -
         name: Login to DockerHub

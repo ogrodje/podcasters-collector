@@ -22,8 +22,8 @@ Options:
 Or with Docker Image
 
 ```bash
-docker run -ti --rm docker.io/ogrodje/podcasters-collector podcasters-collector \
-  --email <EMAIL> --password <PASSWORD>
+docker run -ti --rm ghcr.io/ogrodje/podcasters-collector:latest \
+  podcasters-collector --email <EMAIL> --password <PASSWORD>
 ```
 
 ## Development

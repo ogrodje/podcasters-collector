@@ -43,7 +43,7 @@ $ influx write -b experimenting -f plays.csv
 
 ## Development
 
-Get the latest Rust and then use cargo to build and run this thing.
+Get the latest Rust and then use `cargo buil` to build the project and run it.
 
 ```bash
 $ cargo build --release

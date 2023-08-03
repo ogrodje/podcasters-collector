@@ -6,6 +6,6 @@ macro_rules! anchor_episodes_url {
 }
 pub(crate) use anchor_episodes_url;
 
-pub const ANCHOR_CSRF_URL: &'static str = "https://anchor.fm/api/csrf";
-pub const ANCHOR_LOGIN_URL: &'static str = "https://anchor.fm/api/login";
-pub const ANCHOR_METADATA_URL: &'static str = "https://anchor.fm/api/podcast/metadata";
+pub const ANCHOR_CSRF_URL: &str = "https://anchor.fm/api/csrf";
+pub const ANCHOR_LOGIN_URL: &str = "https://anchor.fm/api/login";
+pub const ANCHOR_METADATA_URL: &str = "https://anchor.fm/api/podcast/metadata";

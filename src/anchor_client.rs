@@ -3,8 +3,8 @@ use ureq::serde_json::{from_value as json_from_value, Value as JsonValue};
 use ureq::{Agent, Response};
 
 use crate::config::{anchor_episodes_url, ANCHOR_CSRF_URL, ANCHOR_LOGIN_URL, ANCHOR_METADATA_URL};
+use crate::credentials::Credentials;
 use crate::error::{to_anchor_error, AnchorError};
-use crate::Credentials;
 
 #[allow(non_snake_case)]
 #[derive(Deserialize)]
@@ -115,7 +115,7 @@ impl AnchorClient {
     }
 
     pub fn all_episodes(&mut self, station_id: &str) -> Result<Vec<Episode>, AnchorError> {
-        fn transform_episodes(items: &Vec<JsonValue>) -> Vec<Episode> {
+        fn transform_episodes(items: &[JsonValue]) -> Vec<Episode> {
             items
                 .iter()
                 .map(|i| json_from_value(i.clone()).unwrap())
@@ -125,7 +125,7 @@ impl AnchorClient {
         self.get_episodes(station_id).and_then(|json| {
             json["items"]
                 .as_array()
-                .map(transform_episodes)
+                .map(|p| transform_episodes(p))
                 .ok_or(AnchorError::TransformationFailed)
         })
     }
@@ -137,41 +137,41 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn parse_json_failure() -> () {
+    fn parse_json_failure() {
         Response::new(200, "Ok", "broken-payload")
             .map_err(|e| AnchorError::HttpError(e.to_string()))
-            .and_then(|r| AnchorClient::parse_json(r))
+            .and_then(AnchorClient::parse_json)
             .expect("Boom");
     }
 
     #[test]
     #[should_panic]
-    fn parse_json_failure_500() -> () {
+    fn parse_json_failure_500() {
         Response::new(500, "Ok", "broken-payload")
             .map_err(|e| AnchorError::HttpError(e.to_string()))
-            .and_then(|r| AnchorClient::parse_json(r))
+            .and_then(AnchorClient::parse_json)
             .expect("Boom");
     }
 
     #[test]
-    fn parse_json_ok() -> () {
+    fn parse_json_ok() {
         let json_result = Response::new(200, "Ok", "{\"result\": \"ok\"}")
             .map_err(|e| AnchorError::HttpError(e.to_string()))
-            .and_then(|r| AnchorClient::parse_json(r))
+            .and_then(AnchorClient::parse_json)
             .unwrap();
 
         assert!(json_result["result"] == "ok", "Parsing JSON has failed.")
     }
 
     #[test]
-    fn parse_string_ok() -> () {
+    fn parse_string_ok() {
         let response = Response::new(200, "ok", "ok").unwrap();
         assert_eq!(AnchorClient::parse_string(response).unwrap(), "ok")
     }
 
     #[test]
     #[should_panic]
-    fn parse_string_failure() -> () {
+    fn parse_string_failure() {
         let response = Response::new(500, "ok", "x").unwrap();
         assert_eq!(AnchorClient::parse_string(response).unwrap(), "ok")
     }

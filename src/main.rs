@@ -1,10 +1,8 @@
-use std::time::Duration;
-
-use clap::{Parser, ValueEnum};
-
 use crate::anchor_client::*;
 use crate::credentials::Credentials;
 use crate::printers::Printers;
+use clap::{Parser, ValueEnum};
+use std::time::Duration;
 
 mod anchor_client;
 mod config;
@@ -23,11 +21,10 @@ pub enum Format {
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 struct CliArgs {
-    #[arg(short, long)]
+    #[arg(short, long, env = "ANCHOR_EMAIL")]
     email: String,
-    #[arg(short, long)]
+    #[arg(short, long, env = "ANCHOR_PASSWORD")]
     password: String,
-
     #[arg(short, long, value_enum, default_value_t = Format::String)]
     format: Format,
 }
@@ -42,7 +39,7 @@ pub(crate) fn main() {
             .build(),
     );
 
-    let _login = anchor
+    anchor
         .get_csrf_token()
         .and_then(|token| {
             anchor.post_login(

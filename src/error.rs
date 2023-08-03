@@ -13,12 +13,12 @@ pub enum AnchorError {
 impl Display for AnchorError {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         match self {
-            AnchorError::HttpError(str) => f.write_str(&format!("HTTP Error {}", str.to_string())),
+            AnchorError::HttpError(str) => f.write_str(&format!("HTTP Error {}", str)),
             AnchorError::JSONParsingError(inner) => {
-                f.write_str(&format!("JSON parsing has failed {}", inner.to_string()))
+                f.write_str(&format!("JSON parsing has failed {}", inner))
             }
             AnchorError::StringParsingError(inner) => {
-                f.write_str(&format!("String parsing has failed {}", inner.to_string()))
+                f.write_str(&format!("String parsing has failed {}", inner))
             }
             other => f.write_str(&format!("Error with {}", other)),
         }

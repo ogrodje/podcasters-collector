@@ -1,6 +1,6 @@
 [package]
 name = "podcasters-collector"
-version = "0.0.5"
+version = "0.0.6"
 edition = "2021"
 authors = ["Oto Brglez <otobrglez@gmail.com>"]
 
@@ -8,8 +8,8 @@ authors = ["Oto Brglez <otobrglez@gmail.com>"]
 # default = ["experimental"]
 
 [dependencies]
-chrono = "0.4.24"
-clap = { version = "4.1", features = ["derive"] }
-rand = "0.8.5"
+chrono = "0.4.26"
+clap = { version = "4.3", features = ["derive", "env"] }
+rand = "0.8"
 serde = { version = "1.0", features = ["derive"] }
-ureq = { version = "2.6", features = ["json", "cookies"] }
+ureq = { version = "2.7", features = ["json", "cookies"] }

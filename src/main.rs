@@ -39,17 +39,15 @@ pub(crate) fn main() {
             .build(),
     );
 
+    let token = anchor.get_csrf_token().expect("Failed fetching token");
     anchor
-        .get_csrf_token()
-        .and_then(|token| {
-            anchor.post_login(
-                &Credentials {
-                    email: args.email,
-                    password: args.password,
-                },
-                &token,
-            )
-        })
+        .post_login(
+            &Credentials {
+                email: args.email,
+                password: args.password,
+            },
+            &token,
+        )
         .expect("Login procedure has failed.");
 
     let episodes: Vec<Episode> = anchor
